@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Announcements{% endblock %}
+
+{% block page_title %}Announcements{% endblock %}
+
+{% block page_actions %}
+    {% if session['user_role'] in ['admin', 'faculty'] %}
+        <a href="{{ url_for('new_announcement') }}" class="btn btn-sm btn-primary">
+            <i class="fas fa-plus"></i> New Announcement
+        </a>
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        {% if announcements %}
+            <div class="list-group">
+                {% for announcement in announcements %}
+                    <div class="list-group-item">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="mb-1">{{ announcement.title }}</h5>
+                            <small>{{ announcement.created_at|datetimeformat('%b %d, %Y %I:%M %p') }}</small>
+                        </div>
+                        <p class="mb-1">{{ announcement.content }}</p>
+                        <small class="text-muted">Posted by: {{ announcement.author.name }}</small>
+                        {% if announcement.is_urgent %}
+                            <span class="badge bg-danger float-end">Urgent</span>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="alert alert-info">
+                No announcements available.
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

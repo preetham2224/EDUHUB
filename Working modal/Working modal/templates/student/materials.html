@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+
+{% block title %}Study Materials{% endblock %}
+
+{% block page_title %}Study Materials{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <h3 class="mb-0">Available Resources</h3>
+        </div>
+        <div class="col-md-6 text-md-end">
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="Search materials..." id="searchInput">
+                <button class="btn btn-outline-secondary" type="button" id="searchButton">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-3 mb-4">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Filters</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Subject</label>
+                        <select class="form-select" id="subjectFilter">
+                            <option value="">All Subjects</option>
+                            {% for subject in subjects|unique %}
+                                <option value="{{ subject }}">{{ subject }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">File Type</label>
+                        <select class="form-select" id="typeFilter">
+                            <option value="">All Types</option>
+                            <option value="Lecture Notes">Lecture Notes</option>
+                            <option value="Assignment">Assignment</option>
+                            <option value="Reference Material">Reference Material</option>
+                            <option value="Exam Paper">Exam Paper</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary w-100" id="applyFilters">Apply Filters</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-9">
+            {% if materials %}
+            <div class="row" id="materialsContainer">
+                {% for material in materials %}
+                <div class="col-lg-4 col-md-6 mb-4 material-card" 
+                     data-subject="{{ material.subject }}" 
+                     data-type="{{ material.file_type }}"
+                     data-title="{{ material.title|lower }}">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-header bg-light">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0 text-truncate">{{ material.title }}</h5>
+                                <span class="badge bg-info">{{ material.file_type }}</span>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text">{{ material.description|truncate(100) }}</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">
+                                    <i class="fas fa-book"></i> {{ material.subject }}
+                                </small>
+                                <small class="text-muted">
+                                    <i class="fas fa-calendar-alt"></i> {{ material.uploaded_at|datetimeformat('%b %d, %Y') }}
+                                </small>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-transparent">
+                            <div class="d-flex justify-content-between">
+                                <small class="text-muted">
+                                    <i class="fas fa-user"></i> {{ material.uploader.name }}
+                                </small>
+                                <a href="{{ url_for('download_material', material_id=material.id) }}" 
+                                   class="btn btn-sm btn-primary download-btn" 
+                                   data-id="{{ material.id }}">
+                                    <i class="fas fa-download"></i> Download
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i> No study materials available yet.
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Search functionality
+    const searchInput = document.getElementById('searchInput');
+    const searchButton = document.getElementById('searchButton');
+    const materialCards = document.querySelectorAll('.material-card');
+    
+    function filterMaterials() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const subjectFilter = document.getElementById('subjectFilter').value;
+        const typeFilter = document.getElementById('typeFilter').value;
+        
+        materialCards.forEach(card => {
+            const matchesSearch = card.dataset.title.includes(searchTerm) || searchTerm === '';
+            const matchesSubject = subjectFilter === '' || card.dataset.subject === subjectFilter;
+            const matchesType = typeFilter === '' || card.dataset.type === typeFilter;
+            
+            if (matchesSearch && matchesSubject && matchesType) {
+                card.style.display = 'block';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    }
+    
+    searchInput.addEventListener('input', filterMaterials);
+    searchButton.addEventListener('click', filterMaterials);
+    document.getElementById('applyFilters').addEventListener('click', filterMaterials);
+    
+    // Track downloads
+    document.querySelectorAll('.download-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const materialId = this.dataset.id;
+            // You can add AJAX call here to track downloads if needed
+            fetch(`/track-download/${materialId}`, { method: 'POST' });
+        });
+    });
+    
+    // Initialize tooltips
+    $('[data-toggle="tooltip"]').tooltip();
+});
+</script>
+{% endblock %}

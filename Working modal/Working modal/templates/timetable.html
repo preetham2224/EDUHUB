@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}Timetable{% endblock %}
+
+{% block page_title %}Timetable{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="card-title mb-0">Weekly Schedule</h5>
+        <div>
+            <button class="btn btn-sm btn-outline-primary me-2" id="prevWeek">
+                <i class="fas fa-chevron-left"></i> Previous
+            </button>
+            <button class="btn btn-sm btn-outline-primary" id="nextWeek">
+                Next <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+    </div>
+    <div class="card-body">
+        {% if timetable %}
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>Monday</th>
+                            <th>Tuesday</th>
+                            <th>Wednesday</th>
+                            <th>Thursday</th>
+                            <th>Friday</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% set timeslots = ['9:00 - 10:30', '10:45 - 12:15', '1:00 - 2:30', '2:45 - 4:15'] %}
+                        {% for slot in timeslots %}
+                            <tr>
+                                <td>{{ slot }}</td>
+                                {% for day in ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'] %}
+                                    <td>
+                                        {% for item in timetable %}
+                                            {% if item.day == day and item.time_slot == slot %}
+                                                <div class="timetable-slot">
+                                                    <strong>{{ item.subject }}</strong><br>
+                                                    <small>{{ item.classroom }}</small><br>
+                                                    <small class="text-muted">{{ item.faculty.name if item.faculty else 'TBA' }}</small>
+                                                </div>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </td>
+                                {% endfor %}
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="alert alert-info">
+                Timetable not available yet.
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Week navigation buttons
+    $('#prevWeek').click(function() {
+        // AJAX call to load previous week
+        alert('Loading previous week...');
+    });
+    
+    $('#nextWeek').click(function() {
+        // AJAX call to load next week
+        alert('Loading next week...');
+    });
+});
+</script>
+{% endblock %}

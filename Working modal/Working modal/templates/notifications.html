@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Notifications{% endblock %}
+
+{% block page_title %}Notifications{% endblock %}
+
+{% block page_actions %}
+    <button class="btn btn-sm btn-outline-danger" id="clearNotifications">
+        <i class="fas fa-trash"></i> Clear All
+    </button>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        {% if notifications %}
+            <div class="list-group">
+                {% for notification in notifications %}
+                    <a href="{{ notification.link or '#' }}" class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">{{ notification.content }}</h6>
+                            <small>{{ notification.created_at|datetimeformat('%b %d, %I:%M %p') }}</small>
+                        </div>
+                        {% if notification.link %}
+                            <small class="text-primary">Click to view</small>
+                        {% endif %}
+                    </a>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="alert alert-info">
+                No notifications available.
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    $('#clearNotifications').click(function() {
+        if (confirm('Are you sure you want to clear all notifications?')) {
+            // AJAX call to clear notifications
+            $.post('{{ url_for("clear_notifications") }}', function() {
+                location.reload();
+            });
+        }
+    });
+});
+</script>
+{% endblock %}

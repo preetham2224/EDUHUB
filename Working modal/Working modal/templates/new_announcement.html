@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}New Announcement{% endblock %}
+
+{% block page_title %}Create New Announcement{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <form method="POST" action="{{ url_for('new_announcement') }}">
+            <div class="mb-3">
+                <label for="title" class="form-label">Title</label>
+                <input type="text" class="form-control" id="title" name="title" required>
+            </div>
+            <div class="mb-3">
+                <label for="content" class="form-label">Content</label>
+                <textarea class="form-control" id="content" name="content" rows="5" required></textarea>
+            </div>
+            <div class="mb-3 form-check">
+                <input type="checkbox" class="form-check-input" id="is_urgent" name="is_urgent">
+                <label class="form-check-label" for="is_urgent">Mark as urgent</label>
+            </div>
+            <button type="submit" class="btn btn-primary">Post Announcement</button>
+            <a href="{{ url_for('announcements') }}" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

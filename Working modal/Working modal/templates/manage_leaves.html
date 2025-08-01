@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Leave Applications{% endblock %}
+
+{% block page_title %}Manage Leave Applications{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h5 class="card-title mb-0">Pending Leave Applications</h5>
+    </div>
+    <div class="card-body">
+        {% if pending_leaves %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Student</th>
+                            <th>Date Range</th>
+                            <th>Reason</th>
+                            <th>Days</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for leave, student_name in pending_leaves %}
+                            <tr>
+                                <td>{{ student_name }}</td>
+                                <td>
+                                    {{ leave.start_date|datetimeformat('%b %d, %Y') }} to 
+                                    {{ leave.end_date|datetimeformat('%b %d, %Y') }}
+                                </td>
+                                <td>{{ leave.reason|truncate(50) }}</td>
+                                <td>
+                                    {% set days = (leave.end_date - leave.start_date).days + 1 %}
+                                    {{ days }} day{% if days > 1 %}s{% endif %}
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="{{ url_for('leave_decision', leave_id=leave.id, decision='approve') }}" class="btn btn-success">
+                                            <i class="fas fa-check"></i> Approve
+                                        </a>
+                                        <a href="{{ url_for('leave_decision', leave_id=leave.id, decision='reject') }}" class="btn btn-danger">
+                                            <i class="fas fa-times"></i> Reject
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="alert alert-success">
+                No pending leave applications.
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
