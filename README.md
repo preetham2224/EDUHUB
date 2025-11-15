@@ -1,1 +1,1 @@
-EduHub is a unified platform designed for students to access study materials, check attendance, request leave permissions, and stay updated with quick announcements from admins. It streamlines academic communication and makes campus life easier and more organized.
+
